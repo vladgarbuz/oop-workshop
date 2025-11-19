@@ -1,0 +1,15 @@
+C:\Users\User\Documents\GitHub\oop-workshop\src\bin\Debug\net9.0\OopWorkshop.exe
+C:\Users\User\Documents\GitHub\oop-workshop\src\bin\Debug\net9.0\OopWorkshop.deps.json
+C:\Users\User\Documents\GitHub\oop-workshop\src\bin\Debug\net9.0\OopWorkshop.runtimeconfig.json
+C:\Users\User\Documents\GitHub\oop-workshop\src\bin\Debug\net9.0\OopWorkshop.dll
+C:\Users\User\Documents\GitHub\oop-workshop\src\bin\Debug\net9.0\OopWorkshop.pdb
+C:\Users\User\Documents\GitHub\oop-workshop\src\obj\Debug\net9.0\OopWorkshop.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Documents\GitHub\oop-workshop\src\obj\Debug\net9.0\OopWorkshop.AssemblyInfoInputs.cache
+C:\Users\User\Documents\GitHub\oop-workshop\src\obj\Debug\net9.0\OopWorkshop.AssemblyInfo.cs
+C:\Users\User\Documents\GitHub\oop-workshop\src\obj\Debug\net9.0\OopWorkshop.csproj.CoreCompileInputs.cache
+C:\Users\User\Documents\GitHub\oop-workshop\src\obj\Debug\net9.0\OopWorkshop.sourcelink.json
+C:\Users\User\Documents\GitHub\oop-workshop\src\obj\Debug\net9.0\OopWorkshop.dll
+C:\Users\User\Documents\GitHub\oop-workshop\src\obj\Debug\net9.0\refint\OopWorkshop.dll
+C:\Users\User\Documents\GitHub\oop-workshop\src\obj\Debug\net9.0\OopWorkshop.pdb
+C:\Users\User\Documents\GitHub\oop-workshop\src\obj\Debug\net9.0\OopWorkshop.genruntimeconfig.cache
+C:\Users\User\Documents\GitHub\oop-workshop\src\obj\Debug\net9.0\ref\OopWorkshop.dll

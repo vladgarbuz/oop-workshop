@@ -1,6 +1,6 @@
 # OOP Workshop
 
-This is a workshop project demonstrating Object-Oriented Programming (OOP) principles in C#. The application simulates a Library management system where users can interact with various media types.
+This is a workshop project demonstrating Object-Oriented Programming (OOP) principles in C#.
 
 ## Project Structure
 
@@ -13,10 +13,6 @@ The solution is organized into the following folders:
 - **test/**: Contains unit tests for the application.
 - **doc/**: Project documentation and specifications.
 - **var/**: Runtime data storage (e.g., `data.csv`).
-
-## Prerequisites
-
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or later.
 
 ## How to Run
 
@@ -34,9 +30,3 @@ To run the unit tests, execute the following command in the root directory:
 ```bash
 dotnet test
 ```
-
-## Features
-
-- **Domain Modeling**: Classes representing Library, Users, and Media.
-- **Persistence**: Data storage using CSV files.
-- **Architecture**: Separation of concerns using Domain, Persistence, and Presentation layers.
