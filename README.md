@@ -53,10 +53,6 @@ dotnet run --project src/OopWorkshop.csproj
 - **Extensibility**: Designed for future growth, allowing new media types or user roles to be added without affecting existing functionality.
 
 ```mermaid
----
-config:
-  layout: elk
----
 classDiagram
 class IReadable {
     +Read()
