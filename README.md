@@ -34,9 +34,6 @@ The system supports three categories of users:
 - **doc/**: Project documentation and specifications.
 - **var/**: Runtime data storage (e.g., `data.csv`).
 
-## Prerequisites
-
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or later.
 
 ## How to Run
 
