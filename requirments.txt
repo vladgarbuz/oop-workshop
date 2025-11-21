@@ -1,0 +1,220 @@
+Functional Requirements
+
+1.1	System Startup & User Role Selection
+•	prompt the user to select their role at startup (Admin, Employee, Borrower).
+•	grant permissions based on the selected role.
+
+1.2	User Management (Admin only)
+•	view all users (Borrowers and Employees).
+•	create new users by entering name, age, and social security number.
+•	update user information (name, age, SSN).
+•	delete any user.
+•	have all permissions of an Employee.
+
+1.3 Media Collection Management
+For Employees (and Admin)
+•	add new media items of any supported type.
+•	remove existing media items.
+•	view the details of any media item.
+
+1.4 Media Types & Required Attributes
+ E-books
+•	Title, author, language, number of pages, publication year, ISBN
+•	Actions: view details, download, read
+Movies
+•	Title, director, genres, release year, language, duration
+•	Actions: view details, watch, download
+ Songs
+•	Title, composer, singer, genre, file type, duration, language
+•	Actions: view details, play, download
+Video Games
+•	Title, genre, publisher, release year, supported platforms
+•	Actions: download, play, complete
+Apps
+•	Title, version, publisher, supported platforms, file size
+•	Actions: download, execute
+Podcasts
+•	Title, release year, host(s), guest(s), episode number, language
+•	Actions: download, listen, complete
+Images
+•	Title, resolution, file format, file size, date taken
+•	Actions: download, display
+
+1.5 Borrower Interactions
+•	list media items by type.
+•	view detailed information about an item.
+•	borrow media items.
+•	rate media items only if they have borrowed them.
+•	perform media-specific actions (read, play, listen, complete, watch, etc.).
+
+1.6 Borrowing System
+•	Users shall be able to borrow any media item.
+•	The system shall track which user has borrowed which item.
+•	Rating shall only be permitted for borrowed items.
+•	The system shall show a message when borrowing or rating is successful.
+
+1.7 Console Interface
+•	show available actions depending on user role.
+•	validate all user input 
+•	invalid actions shall be rejected with a readable error message.
+•	menus shall guide the user step-by-step for all functionality.
+•	the system shall allow the user to return to previous menus or exit.
+
+Non-Functional Requirements
+2.1 Usability
+1.	The console interface must be simple, intuitive, and understandable for all user types.
+2.	All menu items must be presented in a clear and structured format.
+3.	Input validation must ensure error-free operation, preventing crashes or undefined behavior.
+
+2.2 Reliability
+1.	The system must handle invalid inputs gracefully.
+2.	The system must ensure data integrity when adding, removing, borrowing, or rating items.
+3.	The system must prevent unauthorized actions (e.g., Borrower removing items).
+
+2.3 Maintainability & Extensibility
+1.	The design shall support adding new media types without modifying existing core code.
+2.	The system shall support the future addition of new user roles.
+3.	All media types should be implemented using a modular or inheritance-based structure.
+
+2.4 Performance
+1.	The system shall respond to user input with minimal delay.
+2.	Searching, listing, or loading media items shall take no noticeable time for typical library sizes.
+
+2.5 Portability
+1.	The system shall run on any device capable of executing console-based C# applications (Windows, Linux, macOS).
+2.	The storage format (e.g., JSON, files) must be platform-independent.
+
+2.6 Scalability
+1.	The system must handle increasing amounts of media and users without impacting usability.
+2.	Data structures must efficiently support searches and listings.
+
+2.7 Security (Basic, Since No Authentication Yet)
+1.	No user should access actions outside their role.
+2.	The system must not expose sensitive user data beyond what is required.
+3.	Future authentication should be easy to add without redesign.
+
+CRC Cards
+1. MediaItem (Abstract)
+•	Responsibilities:
+o	Store shared media info: Id, Title, Language.
+o	Provide ShowDetails() method for subclasses.
+o	Expose metadata to the system.
+•	Collaborators:
+o	LibraryCatalog
+o	Borrower, Employee, Admin
+o	Media capability interfaces (IPlayable, IReadable, IWatchable, etc.)
+
+2. EBook
+•	Responsibilities:
+o	Store e-book info: Author, Pages, Year, ISBN.
+o	Implement IReadable and IDownloadable.
+o	Show details via ShowDetails().
+•	Collaborators:
+o	MediaItem
+o	LibraryCatalog
+
+3. Movie
+•	Responsibilities:
+o	Store movie info: Director, Genres, ReleaseYear, Duration.
+o	Implement IWatchable and IDownloadable.
+o	Show details via ShowDetails().
+•	Collaborators:
+o	MediaItem
+o	LibraryCatalog
+
+4. Song
+•	Responsibilities:
+o	Store music metadata: Composer, Singer, Genre, FileType, Duration.
+o	Implement IPlayable and IDownloadable.
+o	Show details via ShowDetails().
+•	Collaborators:
+o	MediaItem
+o	LibraryCatalog
+
+5. VideoGame
+•	Responsibilities:
+o	Store game info: Publisher, Genre, ReleaseYear, Platforms.
+o	Implement IPlayable, ICompletable, IDownloadable.
+o	Show details via ShowDetails().
+•	Collaborators:
+o	MediaItem
+o	LibraryCatalog
+
+6. App
+•	Responsibilities:
+o	Store app info: Version, Publisher, Platforms, FileSize.
+o	Implement IDownloadable and IExecutable.
+o	Show details via ShowDetails().
+•	Collaborators:
+o	MediaItem
+o	LibraryCatalog
+
+7. Podcast
+•	Responsibilities:
+o	Store podcast info: Hosts, Guests, Episode, ReleaseYear.
+o	Implement IPlayable, ICompletable, IDownloadable.
+o	Show details via ShowDetails().
+•	Collaborators:
+o	MediaItem
+o	LibraryCatalog
+
+8. ImageFile
+•	Responsibilities:
+o	Store image info: Resolution, Format, FileSize, DateTaken.
+o	Implement IDisplayable and IDownloadable.
+o	Show details via ShowDetails().
+•	Collaborators:
+o	MediaItem
+o	LibraryCatalog
+
+9. Borrower (User)
+•	Responsibilities:
+o	List media by type.
+o	Preview media details.
+o	Borrow media items.
+o	Rate borrowed items only.
+o	Execute media-specific actions (play, read, watch, complete).
+•	Collaborators:
+o	LibraryCatalog
+o	MediaItem subclasses
+
+10. Employee (User)
+•	Responsibilities:
+o	Add media items to LibraryCatalog.
+o	Remove media items.
+o	View media details.
+•	Collaborators:
+o	LibraryCatalog
+o	MediaItem subclasses
+
+11. Admin (User)
+•	Responsibilities:
+o	All Employee responsibilities.
+o	Manage users (Borrowers and Employees): Create, Update, Delete, View.
+•	Collaborators:
+o	LibraryCatalog
+o	Borrower, Employee
+
+12. LibraryCatalog
+•	Responsibilities:
+o	Store all media items.
+o	List items by type.
+o	Search items by ID/title.
+o	Add and remove media items.
+o	Provide media to users.
+•	Collaborators:
+o	MediaItem subclasses
+o	Borrower, Employee, Admin
+
+13. ConsoleUI
+•	Responsibilities:
+o	Display menus and instructions.
+o	Validate user input.
+o	Route commands to LibraryCatalog and Admin (for user management).
+o	Handle role selection.
+o	Prevent invalid operations.
+•	Collaborators:
+o	LibraryCatalog
+o	Admin
+o	Borrower, Employee
++for each saction we should use interface
