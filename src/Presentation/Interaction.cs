@@ -1,18 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using OopWorkshop.Domain;
 using OopWorkshop.Domain.Media;
 using OopWorkshop.Domain.User;
 using OopWorkshop.Domain.Interfaces;
+using OopWorkshop.Persistence;
 
 namespace OopWorkshop.Presentation
 {
 	public class ConsoleUI
 	{
-		private LibraryCatalog catalog = new LibraryCatalog();
+		private readonly LibraryCatalog catalog = new LibraryCatalog();
+		private readonly CsvMediaRepository repository;
 		private Admin admin;
 		private Employee employee;
 		private Borrower borrower;
+
+		public ConsoleUI()
+		{
+			repository = new CsvMediaRepository(ResolveDataFilePath());
+			var seededMedia = repository.LoadMedia();
+			if (seededMedia.Count > 0)
+				catalog.MediaItems = seededMedia;
+		}
 
 		public void Start()
 		{
@@ -79,7 +91,7 @@ namespace OopWorkshop.Presentation
 			Console.Write("Age: "); int age = ReadInt();
 			Console.Write("SSN: "); string ssn = Console.ReadLine();
 			Console.Write("Is Employee? (y/n): "); bool isEmployee = Console.ReadLine().ToLower() == "y";
-			admin.CreateUser(name, age, ssn, isEmployee);
+			PerformWithAnimation($"Creating {(isEmployee ? "employee" : "borrower")} {name}", () => admin.CreateUser(name, age, ssn, isEmployee));
 		}
 
 		private void UpdateUserFlow()
@@ -90,7 +102,7 @@ namespace OopWorkshop.Presentation
 			Console.Write("New Name: "); string newName = Console.ReadLine();
 			Console.Write("New Age: "); int newAge = ReadInt();
 			Console.Write("New SSN: "); string newSsn = Console.ReadLine();
-			admin.UpdateUser(user, newName, newAge, newSsn);
+			PerformWithAnimation($"Updating user {name}", () => admin.UpdateUser(user, newName, newAge, newSsn));
 		}
 
 		private void DeleteUserFlow()
@@ -98,7 +110,7 @@ namespace OopWorkshop.Presentation
 			Console.Write("Enter user name to delete: "); string name = Console.ReadLine();
 			var user = admin.Users.Find(u => u.Name == name);
 			if (user == null) { Console.WriteLine("User not found."); return; }
-			admin.DeleteUser(user);
+			PerformWithAnimation($"Deleting user {name}", () => admin.DeleteUser(user));
 		}
 
 		private void ShowEmployeeMenu(Employee emp = null)
@@ -141,7 +153,11 @@ namespace OopWorkshop.Presentation
 					case "7": item = CreateImageFile(); break;
 					default: Console.WriteLine("Invalid type."); return;
 				}
-				user.AddMedia(catalog.MediaItems, item);
+				PerformWithAnimation($"Adding {item.Title}", () =>
+				{
+					user.AddMedia(catalog.MediaItems, item);
+					PersistCatalog();
+				});
 			}
 			catch { Console.WriteLine("Error adding media. Check input."); }
 		}
@@ -151,7 +167,11 @@ namespace OopWorkshop.Presentation
 			Console.Write("Enter media title to remove: "); string title = Console.ReadLine();
 			var item = catalog.SearchByTitle(title);
 			if (item == null) { Console.WriteLine("Media not found."); return; }
-			user.RemoveMedia(catalog.MediaItems, item);
+			PerformWithAnimation($"Removing {item.Title}", () =>
+			{
+				user.RemoveMedia(catalog.MediaItems, item);
+				PersistCatalog();
+			});
 		}
 
 		private void ViewMediaDetailsFlow()
@@ -159,7 +179,7 @@ namespace OopWorkshop.Presentation
 			Console.Write("Enter media title: "); string title = Console.ReadLine();
 			var item = catalog.SearchByTitle(title);
 			if (item == null) { Console.WriteLine("Media not found."); return; }
-			item.ShowDetails();
+			PerformWithAnimation($"Loading {item.Title} details", () => item.ShowDetails());
 		}
 
 		private void ShowBorrowerMenu()
@@ -203,7 +223,7 @@ namespace OopWorkshop.Presentation
 				_ => null
 			};
 			if (t == null) { Console.WriteLine("Invalid type."); return; }
-			borrower.ListMediaByType(catalog.MediaItems, t);
+			PerformWithAnimation($"Listing {t.Name} items", () => borrower.ListMediaByType(catalog.MediaItems, t));
 		}
 
 		private void BorrowMediaFlow()
@@ -211,7 +231,7 @@ namespace OopWorkshop.Presentation
 			Console.Write("Enter media title to borrow: "); string title = Console.ReadLine();
 			var item = catalog.SearchByTitle(title);
 			if (item == null) { Console.WriteLine("Media not found."); return; }
-			borrower.Borrow(item);
+			PerformWithAnimation($"Borrowing {item.Title}", () => borrower.Borrow(item));
 		}
 
 		private void RateMediaFlow()
@@ -220,7 +240,7 @@ namespace OopWorkshop.Presentation
 			var item = catalog.SearchByTitle(title);
 			if (item == null) { Console.WriteLine("Media not found."); return; }
 			Console.Write("Enter rating (1-5): "); int rating = ReadInt(1, 5);
-			borrower.Rate(item, rating);
+			PerformWithAnimation($"Rating {item.Title}", () => borrower.Rate(item, rating));
 		}
 
 		private void MediaActionFlow()
@@ -228,13 +248,21 @@ namespace OopWorkshop.Presentation
 			Console.Write("Enter media title: "); string title = Console.ReadLine();
 			var item = catalog.SearchByTitle(title);
 			if (item == null) { Console.WriteLine("Media not found."); return; }
-			if (item is IReadable r) r.Read();
-			if (item is IPlayable p) p.Play();
-			if (item is IWatchable w) w.Watch();
-			if (item is ICompletable c) c.Complete();
-			if (item is IDownloadable d) d.Download();
-			if (item is IExecutable e) e.Execute();
-			if (item is IDisplayable disp) disp.Display();
+			var actions = BuildActionOptions(item);
+			if (actions.Count == 0)
+			{
+				Console.WriteLine("No actions available for this media item.");
+				return;
+			}
+
+			Console.WriteLine("Available actions:");
+			for (int i = 0; i < actions.Count; i++)
+				Console.WriteLine($"{i + 1}. {actions[i].Label}");
+
+			Console.Write("Choose an action number: ");
+			int choice = ReadInt(1, actions.Count);
+			var selection = actions[choice - 1];
+			PerformWithAnimation($"{selection.Label} {item.Title}", selection.Execute);
 		}
 
 		private int ReadInt(int min = int.MinValue, int max = int.MaxValue)
@@ -316,6 +344,63 @@ namespace OopWorkshop.Presentation
 			Console.Write("DateTaken: "); string dateTaken = Console.ReadLine();
 			Console.Write("Language: "); string lang = Console.ReadLine();
 			return new ImageFile(title, resolution, format, fileSize, dateTaken, lang);
+		}
+
+		private List<(string Label, Action Execute)> BuildActionOptions(MediaItem item)
+		{
+			var actions = new List<(string Label, Action Execute)>();
+			if (item is IReadable readable) actions.Add(("Read", readable.Read));
+			if (item is IPlayable playable) actions.Add(("Play", playable.Play));
+			if (item is IWatchable watchable) actions.Add(("Watch", watchable.Watch));
+			if (item is ICompletable completable) actions.Add(("Complete", completable.Complete));
+			if (item is IDownloadable downloadable) actions.Add(("Download", downloadable.Download));
+			if (item is IExecutable executable) actions.Add(("Execute", executable.Execute));
+			if (item is IDisplayable displayable) actions.Add(("Display", displayable.Display));
+			return actions;
+		}
+
+		private void PerformWithAnimation(string description, Action action, int durationMs = 900)
+		{
+			RunSpinner(description, durationMs);
+			action?.Invoke();
+		}
+
+		private void RunSpinner(string description, int durationMs)
+		{
+			var frames = new[] { '|', '/', '-', '\\' };
+			var start = DateTime.UtcNow;
+			var index = 0;
+			if (durationMs < 200)
+				durationMs = 200;
+			while ((DateTime.UtcNow - start).TotalMilliseconds < durationMs)
+			{
+				Console.Write($"\r{description} {frames[index++ % frames.Length]}");
+				Thread.Sleep(90);
+			}
+			Console.WriteLine($"\r{description} done.   ");
+		}
+
+		private void PersistCatalog()
+		{
+			repository.SaveMedia(catalog.MediaItems);
+		}
+
+		private static string ResolveDataFilePath()
+		{
+			var candidates = new[]
+			{
+				Path.Combine(Directory.GetCurrentDirectory(), "var", "data.csv"),
+				Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "var", "data.csv")
+			};
+
+			foreach (var candidate in candidates)
+			{
+				var dir = Path.GetDirectoryName(candidate);
+				if (File.Exists(candidate) || (!string.IsNullOrEmpty(dir) && Directory.Exists(dir)))
+					return Path.GetFullPath(candidate);
+			}
+
+			return Path.GetFullPath(candidates[candidates.Length - 1]);
 		}
 	}
 }

@@ -48,8 +48,9 @@ dotnet run --project src/OopWorkshop.csproj
 - **Domain Modeling**: The system models media items, users, and their behaviors using Object-Oriented Programming (OOP) principles.  
 - **Interfaces**: Media actions such as play, read, watch, download, execute, complete, and display are defined through interfaces and implemented by the corresponding media classes.  
 - **User Roles**: Supports three user roles—Borrower, Employee, and Admin—each with clearly defined responsibilities.  
-- **Persistence**: Data is stored and managed using CSV files, enabling simple and persistent storage of media and user information.  
+- **Persistence**: Media catalog changes load from and save to `var/data.csv` through the new `CsvMediaRepository`, keeping employee edits between runs without adding a database.  
 - **Presentation**: A console-based interface guides users with clear instructions, validates inputs, and ensures proper execution of actions.  
+- **Presentation**: A console-based interface now adds lightweight spinner animations for every user action, making feedback clearer while inputs are processed.  
 - **Extensibility**: Designed for future growth, allowing new media types or user roles to be added without affecting existing functionality.
 
 ![Domain Class Diagram](diagram.svg)
